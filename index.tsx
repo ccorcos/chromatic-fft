@@ -1,7 +1,8 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import { css } from "glamor"
-import * as song from "./wave2.mp3"
+import * as wave from "./wave2.mp3"
+import * as song from "./song.mp3"
 import Component from "reactive-magic/component"
 import { Value } from "reactive-magic"
 import * as _ from "lodash"
@@ -77,6 +78,8 @@ function computeFFT(buffer: Array<number>) {
 }
 
 class App extends Component {
+	private song = new Value(wave)
+
 	private handleRef = (node: HTMLAudioElement | null) => {
 		if (node) {
 			const source = context.createMediaElementSource(node)
@@ -88,7 +91,13 @@ class App extends Component {
 	view() {
 		return (
 			<div>
-				<audio ref={this.handleRef} src={song} controls={true} />
+				{this.song.get() === wave && (
+					<button onClick={() => this.song.set(song)}>song</button>
+				)}
+				{this.song.get() === song && (
+					<button onClick={() => this.song.set(wave)}>wave</button>
+				)}
+				<audio ref={this.handleRef} src={this.song.get()} controls={true} />
 				<div>
 					{fftValue.get().map((x, i) => {
 						const width = 20
@@ -148,7 +157,7 @@ class App extends Component {
 							}
 						}
 
-						style.background = `rgba(0,0,255,${x * 20})`
+						style.background = `rgba(0,0,255,${x * 50})`
 
 						return <div key={i} style={style} />
 					})}
